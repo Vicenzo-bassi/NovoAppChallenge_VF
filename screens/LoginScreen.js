@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ImageBackground } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const userToken = await AsyncStorage.getItem('userToken');
+      if (userToken) {
+        navigation.navigate('Modulos'); // Redireciona se já estiver logado
+      }
+    };
+
+    checkLoginStatus();
+  }, [navigation]);
+
+  const handleLogin = async () => {
     if (username === 'RM000000' && password === '123') {
       setErrorMessage('');
+      await AsyncStorage.setItem('userToken', 'RM000000'); // Armazenar token de login
       navigation.navigate('Modulos');
     } else {
       setErrorMessage('Usuário ou senha incorretos.');
@@ -17,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require('../assets/LoginScreenImg2.png')} 
+      source={require('../assets/LoginScreenImg2.png')}
       style={styles.background}
     >
       <View style={styles.container}>
@@ -51,7 +64,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover', 
+    resizeMode: 'cover',
   },
   container: {
     flex: 1,
@@ -68,7 +81,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    opacity: 0.9, 
+    opacity: 0.9,
   },
   title: {
     fontSize: 24,
